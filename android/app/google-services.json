@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "316448819577",
+    "project_id": "chc-auto-app",
+    "storage_bucket": "chc-auto-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:316448819577:android:e234280880971de02d87a8",
+        "android_client_info": {
+          "package_name": "com.example.chc_auto_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDweGgQPscHGwiBr7mpXajfGM-oa8ZHi7w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
