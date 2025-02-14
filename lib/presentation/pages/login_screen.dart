@@ -1,5 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../data/repositories/auth_service.dart';
+import '../../core/theme/app_colors.dart';
+import '../widgets/custom_text_field.dart';
+import 'home_screen.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -20,21 +24,27 @@ class _LoginScreenState extends State<LoginScreen> {
 
     setState(() => _isLoading = true);
 
-    String? errorMessage = await _authService.loginUser(
-      email: _emailController.text,
-      password: _passwordController.text,
-    );
+    try {
+      UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
 
-    setState(() => _isLoading = false);
+      String userId = userCredential.user!.uid; // 🔹 Obtendo o ID do usuário
 
-    if (errorMessage == null) {
-      _showSuccessDialog();
-    } else {
-      _showErrorSnackBar(errorMessage);
+      setState(() => _isLoading = false);
+
+      _showSuccessDialog(userId); // 🔹 Agora passa o userId corretamente
+    } catch (e) {
+      setState(() => _isLoading = false);
+      _showErrorSnackBar("Erro ao fazer login: ${e.toString()}");
     }
   }
 
-  void _showSuccessDialog() {
+  // Após login bem-sucedido
+  void _showSuccessDialog(String userId) {
+    // 🔹 Agora recebe userId
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -44,7 +54,13 @@ class _LoginScreenState extends State<LoginScreen> {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              // Aqui você pode redirecionar para a tela principal do app
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => HomeScreen(
+                      userId: userId), // 🔹 Passando userId para HomeScreen
+                ),
+              );
             },
             child: Text("OK"),
           ),
@@ -72,118 +88,82 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.deepPurple, // Cor de fundo moderna
+      backgroundColor: AppColors.black,
       body: Center(
         child: SingleChildScrollView(
           padding: EdgeInsets.all(24),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Logo do App
-              Icon(Icons.car_rental, size: 80, color: Colors.white),
+              Icon(Icons.car_rental, size: 80, color: AppColors.ashGray),
               SizedBox(height: 20),
-
-              // Título
               Text(
                 "Bem-vindo ao CHC Auto App",
                 style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white),
+                    color: AppColors.ashGray),
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 30),
-
-              // Formulário de Login
               Form(
                 key: _formKey,
                 child: Column(
                   children: [
-                    _buildTextField(
-                        _emailController, "E-mail", Icons.email, false),
-                    SizedBox(height: 15),
-                    _buildTextField(
-                        _passwordController, "Senha", Icons.lock, true),
+                    CustomTextField(
+                        controller: _emailController,
+                        label: "E-mail",
+                        icon: Icons.email),
+                    CustomTextField(
+                        controller: _passwordController,
+                        label: "Senha",
+                        icon: Icons.lock,
+                        isPassword: true),
                   ],
                 ),
               ),
-
-              // Esqueceu a senha?
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
-                  onPressed: () {
-                    // Ação para recuperação de senha
-                  },
+                  onPressed: () {},
                   child: Text("Esqueceu a senha?",
-                      style: TextStyle(color: Colors.white70)),
+                      style: TextStyle(color: AppColors.ashGray)),
                 ),
               ),
-
               SizedBox(height: 20),
-
-              // Botão de Login
               _isLoading
-                  ? CircularProgressIndicator(color: Colors.white)
+                  ? CircularProgressIndicator(color: AppColors.cadetGray)
                   : SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: _loginUser,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
+                          backgroundColor: AppColors.cadetGray,
+                          foregroundColor: AppColors.black,
                           padding: EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+                              borderRadius: BorderRadius.circular(12)),
                         ),
-                        child: Text(
-                          "Entrar",
-                          style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.deepPurple,
-                              fontWeight: FontWeight.bold),
-                        ),
+                        child: Text("Entrar",
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold)),
                       ),
                     ),
-
               SizedBox(height: 20),
-
-              // Link para Registro
               TextButton(
                 onPressed: () {
                   Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => RegisterScreen()),
-                  );
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => RegisterScreen()));
                 },
                 child: Text("Ainda não tem conta? Registre-se",
-                    style: TextStyle(color: Colors.white)),
+                    style: TextStyle(color: AppColors.ashGray)),
               ),
             ],
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildTextField(TextEditingController controller, String label,
-      IconData icon, bool isPassword) {
-    return TextFormField(
-      controller: controller,
-      obscureText: isPassword,
-      style: TextStyle(color: Colors.white),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: TextStyle(color: Colors.white70),
-        prefixIcon: Icon(icon, color: Colors.white70),
-        filled: true,
-        fillColor: Colors.white.withOpacity(0.2),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide.none,
-        ),
-      ),
-      validator: (value) => value!.isEmpty ? "Campo obrigatório" : null,
     );
   }
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../data/repositories/auth_service.dart';
+import '../../core/theme/app_colors.dart';
+import '../widgets/custom_text_field.dart';
 import 'login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -46,7 +48,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text("Conta Criada!"),
+        title: Text("Conta Criada!", style: TextStyle(color: AppColors.onyx)),
         content: Text(
             "Registro realizado com sucesso! Agora você pode fazer login."),
         actions: [
@@ -58,7 +60,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 MaterialPageRoute(builder: (context) => LoginScreen()),
               );
             },
-            child: Text("OK"),
+            child: Text("OK", style: TextStyle(color: AppColors.cadetGray)),
           ),
         ],
       ),
@@ -87,7 +89,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.deepPurple, // Cor de fundo moderna
+      backgroundColor: AppColors.black,
       body: Center(
         child: SingleChildScrollView(
           padding: EdgeInsets.all(24),
@@ -95,7 +97,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // Logo do App
-              Icon(Icons.car_rental, size: 80, color: Colors.white),
+              Icon(Icons.car_rental, size: 80, color: AppColors.ashGray),
               SizedBox(height: 20),
 
               // Título
@@ -104,7 +106,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white),
+                    color: AppColors.ashGray),
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 30),
@@ -114,20 +116,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 key: _formKey,
                 child: Column(
                   children: [
-                    _buildTextField(
-                        _nameController, "Nome Completo", Icons.person, false),
-                    SizedBox(height: 15),
-                    _buildTextField(
-                        _emailController, "E-mail", Icons.email, false),
-                    SizedBox(height: 15),
-                    _buildTextField(
-                        _phoneController, "Telefone", Icons.phone, false),
-                    SizedBox(height: 15),
-                    _buildTextField(
-                        _passwordController, "Senha", Icons.lock, true),
-                    SizedBox(height: 15),
-                    _buildTextField(_confirmPasswordController,
-                        "Confirmar Senha", Icons.lock_outline, true),
+                    CustomTextField(
+                        controller: _nameController,
+                        label: "Nome Completo",
+                        icon: Icons.person),
+                    CustomTextField(
+                        controller: _emailController,
+                        label: "E-mail",
+                        icon: Icons.email),
+                    CustomTextField(
+                        controller: _phoneController,
+                        label: "Telefone",
+                        icon: Icons.phone),
+                    CustomTextField(
+                        controller: _passwordController,
+                        label: "Senha",
+                        icon: Icons.lock,
+                        isPassword: true),
+                    CustomTextField(
+                        controller: _confirmPasswordController,
+                        label: "Confirmar Senha",
+                        icon: Icons.lock_outline,
+                        isPassword: true),
                   ],
                 ),
               ),
@@ -136,25 +146,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
               // Botão de Registro
               _isLoading
-                  ? CircularProgressIndicator(color: Colors.white)
+                  ? CircularProgressIndicator(color: AppColors.cadetGray)
                   : SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: _registerUser,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
+                          backgroundColor: AppColors.cadetGray,
+                          foregroundColor: AppColors.black,
                           padding: EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+                              borderRadius: BorderRadius.circular(12)),
                         ),
-                        child: Text(
-                          "Registrar",
-                          style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.deepPurple,
-                              fontWeight: FontWeight.bold),
-                        ),
+                        child: Text("Registrar",
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold)),
                       ),
                     ),
 
@@ -163,44 +169,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
               // Link para Login
               TextButton(
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => LoginScreen()),
-                  );
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => LoginScreen()));
                 },
                 child: Text("Já tem uma conta? Fazer Login",
-                    style: TextStyle(color: Colors.white)),
+                    style: TextStyle(color: AppColors.ashGray)),
               ),
             ],
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildTextField(TextEditingController controller, String label,
-      IconData icon, bool isPassword) {
-    return TextFormField(
-      controller: controller,
-      obscureText: isPassword,
-      style: TextStyle(color: Colors.white),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: TextStyle(color: Colors.white70),
-        prefixIcon: Icon(icon, color: Colors.white70),
-        filled: true,
-        fillColor: Colors.white.withOpacity(0.2),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide.none,
-        ),
-      ),
-      validator: (value) {
-        if (value!.isEmpty) return "Campo obrigatório";
-        if (label == "Confirmar Senha" && value != _passwordController.text)
-          return "As senhas não coincidem";
-        return null;
-      },
     );
   }
 }
