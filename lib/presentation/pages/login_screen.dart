@@ -1,35 +1,27 @@
 import 'package:flutter/material.dart';
 import '../../data/repositories/auth_service.dart';
-import 'login_screen.dart';
+import 'register_screen.dart';
 
-class RegisterScreen extends StatefulWidget {
+class LoginScreen extends StatefulWidget {
   @override
-  _RegisterScreenState createState() => _RegisterScreenState();
+  _LoginScreenState createState() => _LoginScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final AuthService _authService = AuthService();
 
-  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
-
   bool _isLoading = false;
 
-  // Método para chamar o serviço de registro
-  Future<void> _registerUser() async {
+  Future<void> _loginUser() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
 
-    String? errorMessage = await _authService.registerUser(
-      name: _nameController.text,
+    String? errorMessage = await _authService.loginUser(
       email: _emailController.text,
-      phone: _phoneController.text,
       password: _passwordController.text,
     );
 
@@ -46,17 +38,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text("Conta Criada!"),
-        content: Text(
-            "Registro realizado com sucesso! Agora você pode fazer login."),
+        title: Text("Bem-vindo!"),
+        content: Text("Login realizado com sucesso!"),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => LoginScreen()),
-              );
+              // Aqui você pode redirecionar para a tela principal do app
             },
             child: Text("OK"),
           ),
@@ -76,11 +64,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   void dispose() {
-    _nameController.dispose();
     _emailController.dispose();
-    _phoneController.dispose();
     _passwordController.dispose();
-    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -100,7 +85,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
               // Título
               Text(
-                "Crie sua Conta",
+                "Bem-vindo ao CHC Auto App",
                 style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -109,38 +94,41 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               SizedBox(height: 30),
 
-              // Formulário de Registro
+              // Formulário de Login
               Form(
                 key: _formKey,
                 child: Column(
                   children: [
                     _buildTextField(
-                        _nameController, "Nome Completo", Icons.person, false),
-                    SizedBox(height: 15),
-                    _buildTextField(
                         _emailController, "E-mail", Icons.email, false),
                     SizedBox(height: 15),
                     _buildTextField(
-                        _phoneController, "Telefone", Icons.phone, false),
-                    SizedBox(height: 15),
-                    _buildTextField(
                         _passwordController, "Senha", Icons.lock, true),
-                    SizedBox(height: 15),
-                    _buildTextField(_confirmPasswordController,
-                        "Confirmar Senha", Icons.lock_outline, true),
                   ],
+                ),
+              ),
+
+              // Esqueceu a senha?
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () {
+                    // Ação para recuperação de senha
+                  },
+                  child: Text("Esqueceu a senha?",
+                      style: TextStyle(color: Colors.white70)),
                 ),
               ),
 
               SizedBox(height: 20),
 
-              // Botão de Registro
+              // Botão de Login
               _isLoading
                   ? CircularProgressIndicator(color: Colors.white)
                   : SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: _registerUser,
+                        onPressed: _loginUser,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           padding: EdgeInsets.symmetric(vertical: 14),
@@ -149,7 +137,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                         ),
                         child: Text(
-                          "Registrar",
+                          "Entrar",
                           style: TextStyle(
                               fontSize: 18,
                               color: Colors.deepPurple,
@@ -160,15 +148,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
               SizedBox(height: 20),
 
-              // Link para Login
+              // Link para Registro
               TextButton(
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => LoginScreen()),
+                    MaterialPageRoute(builder: (context) => RegisterScreen()),
                   );
                 },
-                child: Text("Já tem uma conta? Fazer Login",
+                child: Text("Ainda não tem conta? Registre-se",
                     style: TextStyle(color: Colors.white)),
               ),
             ],
@@ -195,12 +183,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           borderSide: BorderSide.none,
         ),
       ),
-      validator: (value) {
-        if (value!.isEmpty) return "Campo obrigatório";
-        if (label == "Confirmar Senha" && value != _passwordController.text)
-          return "As senhas não coincidem";
-        return null;
-      },
+      validator: (value) => value!.isEmpty ? "Campo obrigatório" : null,
     );
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'core/firebase_options.dart';
-import 'presentation/pages/register_screen.dart';
+import 'presentation/pages/login_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,17 +19,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'CHC Auto App',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.deepPurple,
-        brightness: Brightness.light,
-      ),
-      darkTheme: ThemeData(
-        brightness: Brightness.dark,
-        primarySwatch: Colors.deepPurple,
-      ),
-      themeMode:
-          ThemeMode.system, // Alterna entre light e dark mode automaticamente
-      home: RegisterScreen(),
+      theme: ThemeData(primarySwatch: Colors.deepPurple),
+      home: LoginScreen(),
     );
   }
 }
